@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shake and Gulp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Poppins',sans-serif;background:#000;}
+
+        /* ================= NAVBAR ================= */
+        .navbar{
+            position:fixed;
+            top:20px;
+            left:50%;
+            transform:translateX(-50%);
+            width:90%;
+            padding:15px 40px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            backdrop-filter:blur(20px);
+            background:rgba(255,255,255,0.08);
+            border:1px solid rgba(255,255,255,0.2);
+            border-radius:50px;
+            z-index:1000;
+        }
+        .logo{color:#fff;font-weight:700;font-size:20px;}
+        .nav-links a{color:#fff;text-decoration:none;margin-left:30px;}
+
+        /* ================= HERO ================= */
+        .hero{
+            position:relative;
+            width:100%;
+            height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            overflow:hidden;
+        }
+
+        /* Background */
+        .bg{
+            position:absolute;
+            width:100%;
+            height:100%;
+            background-size:cover;
+            background-position:center;
+            transition:1.2s ease-in-out;
+            z-index:-3;
+            animation:bgZoom 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgZoom{
+            from{transform:scale(1);}
+            to{transform:scale(1.1);}
+        }
+
+        .overlay{
+            position:absolute;
+            width:100%;
+            height:100%;
+            background:linear-gradient(to bottom,rgba(0,0,0,.4),rgba(0,0,0,.7));
+            z-index:-2;
+        }
+
+        /* HERO TEXT */
+        .hero-text{
+            position:absolute;
+            top:20%;
+            font-size:70px;
+            color:#fff;
+            font-weight:700;
+            letter-spacing:4px;
+        }
+
+        /* Flavor text */
+        .flavor{
+            position:absolute;
+            top:87%;
+            color:#fff;
+            font-size:22px;
+            letter-spacing:3px;
+            opacity:.8;
+            transition:.5s ease;
+        }
+
+        /* CAN */
+        /* CINEMATIC CAN */
+.can{
+    position:absolute;
+    width:650px;
+    bottom:80px;
+    left:50%;
+    transform:translateX(-50%) rotateY(0deg) rotateX(0deg);
+    transition:transform 1.2s cubic-bezier(.22,1,.36,1),
+               filter .6s ease;
+    animation:idleFloat 4s ease-in-out infinite;
+    transform-style:preserve-3d;
+}
+
+/* Soft idle floating */
+@keyframes idleFloat{
+    0%,100%{transform:translateX(-50%) translateY(0) rotateX(2deg);}
+    50%{transform:translateX(-50%) translateY(-18px) rotateX(-2deg);}
+}
+
+/* CINEMATIC TRANSITION */
+.cinematic{
+    animation:cinematicSpin 1.2s cubic-bezier(.22,1,.36,1);
+}
+
+@keyframes cinematicSpin{
+    0%{
+        transform:translateX(-50%) rotateY(0deg) scale(1);
+        filter:blur(0px);
+    }
+
+    40%{
+        transform:translateX(-50%) rotateY(90deg) scale(1.15);
+        filter:blur(4px);
+    }
+
+    60%{
+        transform:translateX(-50%) rotateY(200deg) scale(1.1);
+        filter:blur(3px);
+    }
+
+    100%{
+        transform:translateX(-50%) rotateY(360deg) scale(1);
+        filter:blur(0px);
+    }
+}
+        /* WATER SPLASH */
+        .water{
+            position:absolute;
+            width:700px;
+            bottom:50px;
+            z-index:2;
+            opacity:.9;
+            animation:rotateWater 12s linear infinite;
+        }
+
+        @keyframes rotateWater{
+            from{transform:rotate(0deg);}
+            to{transform:rotate(360deg);}
+        }
+
+        /* LEMON + MINT */
+        .lemon{
+            position:absolute;
+            width:150px;
+            left:28%;
+            bottom:150px;
+            animation:floatItem 5s ease-in-out infinite;
+        }
+
+        .mint{
+            position:absolute;
+            width:150px;
+            right:28%;
+            bottom:170px;
+            animation:floatItem 6s ease-in-out infinite;
+        }
+
+        @keyframes floatItem{
+            0%,100%{transform:translateY(0);}
+            50%{transform:translateY(-25px);}
+        }
+
+        /* GLASS ARROWS */
+        .arrow{
+            position:absolute;
+            top:50%;
+            transform:translateY(-50%);
+            width:60px;
+            height:60px;
+            border-radius:50%;
+            backdrop-filter:blur(20px);
+            background:rgba(255,255,255,0.1);
+            border:1px solid rgba(255,255,255,0.3);
+            color:#fff;
+            font-size:28px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            transition:.3s;
+            z-index:5;
+        }
+
+        .arrow:hover{
+            background:rgba(255,255,255,0.3);
+            box-shadow:0 0 20px rgba(255,255,255,0.6);
+        }
+
+        .left{left:40px;}
+        .right{right:40px;}
+
+        @media(max-width:768px){
+            .hero-text{font-size:40px;}
+            .can{width:260px;}
+            .water{width:350px;}
+        }
+        .hero{
+    perspective:1200px;
+}
+        .support-text{
+    position:absolute;
+    top:120px;      /* distance from top */
+    left:80px;      /* distance from left */
+    color:black;
+    max-width:300px;
+    line-height:1.2;
+    z-index:4;
+}
+
+        /* ================= EXPLORE BUTTON ================= */
+
+.explore-btn{
+    position:absolute;
+    right:50px;
+    bottom:50px;
+    padding:15px 35px;
+    border-radius:50px;
+    backdrop-filter:blur(20px);
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.3);
+    color:#fff;
+    text-decoration:none;
+    font-weight:500;
+    letter-spacing:2px;
+    transition:.4s ease;
+    z-index:10;
+}
+
+.explore-btn:hover{
+    background:rgba(255,255,255,0.25);
+    box-shadow:0 0 25px rgba(255,255,255,.6);
+    transform:translateY(-5px);
+}
+
+ html{
+    scroll-behavior:smooth;
+}
+
+        /* ================= FLAVOUR SHOWCASE ================= */
+
+.flavour-showcase{
+    position:relative;
+    width:100%;
+    height:100vh;
+    overflow:hidden;
+    background:#000;
+}
+
+/* Floating animated background */
+
+
+
+.flavour-showcase{
+    position:relative;
+    width:100%;
+    height:100vh;
+    overflow:hidden;
+    background:
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url("https://images.unsplash.com/photo-1517093911940-08cb5b3952e7?q=80&w=744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* Title top right */
+.flavour-title{
+    position:absolute;
+    top:60px;
+    right:80px;
+    font-size:60px;
+    color:#fff;
+    letter-spacing:5px;
+}
+
+/* Slider */
+.can-slider{
+    position:absolute;
+    bottom:120px;
+    display:flex;
+    gap:80px;
+    width:200%;
+    animation:scrollCans 25s linear infinite;
+}
+
+@keyframes scrollCans{
+    from{transform:translateX(-50%);}
+    to{transform:translateX(0);}
+}
+
+.can-box{
+    text-align:center;
+    color:#fff;
+}
+
+.can-box img{
+    width:420px;
+    animation:floatCan 4s ease-in-out infinite;
+}
+
+@keyframes floatCan{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-20px);}
+}
+
+.can-box p{
+    margin-top:15px;
+    letter-spacing:2px;
+    opacity:.8;
+}
+
+        .floating-bg{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:url("https://plus.unsplash.com/premium_photo-1757503434834-54b71a8964dc?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover no-repeat;
+
+}
+
+
+
+/* ================= WHEAT SHOTS ================= */
+
+.wheat-section{
+    position:relative;
+    width:100%;
+    height:100vh;
+    overflow:hidden;
+    background:
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url("https://plus.unsplash.com/premium_photo-1757503434834-54b71a8964dc?q=80&w=1332&auto=format&fit=crop");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+/* Title top left */
+.wheat-title{
+    position:absolute;
+    top:60px;
+    left:80px;
+    font-size:60px;
+    color:#fff;
+    letter-spacing:5px;
+}
+
+/* Slider opposite direction */
+.wheat-slider{
+    position:absolute;
+    bottom:120px;
+    display:flex;
+    gap:80px;
+    width:200%;
+    animation:scrollWheat 30s linear infinite;
+}
+
+/* Opposite direction from flavour */
+@keyframes scrollWheat{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+}
+
+/* Stop animation on hover */
+.wheat-slider:hover{
+    animation-play-state:paused;
+}
+
+/* Boxes clickable */
+.wheat-box{
+    text-align:center;
+    color:#fff;
+    text-decoration:none;
+    transition:transform .4s ease;
+}
+
+.wheat-box img{
+    width:420px;
+    animation:floatCan 4s ease-in-out infinite;
+}
+
+/* Hover effect */
+.wheat-box:hover{
+    transform:scale(1.1);
+}
+
+.wheat-box p{
+    margin-top:15px;
+    letter-spacing:2px;
+    opacity:.8;
+}
+
+        /* ================= LOVE TO READ ================= */
+
+.read-section{
+    position:relative;
+    width:100%;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        url("https://images.unsplash.com/photo-1492724441997-5dc865305da7?q=80&w=1400");
+    background-size:cover;
+    background-position:center;
+}
+
+/* Title */
+.read-title{
+    position:absolute;
+    top:60px;
+    left:80px;
+    font-size:60px;
+    color:#fff;
+    letter-spacing:4px;
+}
+
+/* Card Container */
+.read-container{
+    display:flex;
+    gap:60px;
+    margin-top:130px;
+}
+
+/* Glass Card */
+.read-card{
+    width:320px;
+    padding:25px;
+    border-radius:25px;
+    backdrop-filter:blur(20px);
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#fff;
+    text-align:center;
+    animation:floatGlass 6s ease-in-out infinite;
+    transition:.4s ease;
+}
+
+/* Floating animation */
+@keyframes floatGlass{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-20px);}
+}
+
+.read-card:hover{
+    transform:translateY(-10px) scale(1.05);
+    box-shadow:0 20px 40px rgba(0,0,0,0.6);
+}
+
+/* Image */
+.read-card img{
+    width:100%;
+    border-radius:15px;
+    margin-bottom:15px;
+}
+
+/* Button */
+.read-btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:10px 25px;
+    border-radius:30px;
+    backdrop-filter:blur(10px);
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.3);
+    color:#fff;
+    text-decoration:none;
+    transition:.3s ease;
+}
+
+.read-btn:hover{
+    background:rgba(255,255,255,0.4);
+    color:#000;
+}
+
+        /* ================= FOOTER ================= */
+
+.footer{
+    position:relative;
+    width:100%;
+    padding:80px 10% 30px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(25px);
+    border-top:1px solid rgba(255,255,255,0.15);
+    color:#fff;
+}
+
+.footer-container{
+    display:flex;
+    justify-content:space-between;
+    gap:60px;
+    flex-wrap:wrap;
+}
+
+.footer-col{
+    flex:1;
+    min-width:220px;
+}
+
+.footer-col h2{
+    font-size:28px;
+    margin-bottom:15px;
+}
+
+.footer-col h3{
+    font-size:18px;
+    margin-bottom:15px;
+    letter-spacing:2px;
+}
+
+.footer-col p{
+    opacity:.8;
+    margin-bottom:10px;
+}
+
+.footer-col a{
+    display:block;
+    color:#fff;
+    text-decoration:none;
+    margin-bottom:8px;
+    opacity:.8;
+    transition:.3s ease;
+}
+
+.footer-col a:hover{
+    opacity:1;
+    transform:translateX(5px);
+}
+
+.footer-bottom{
+    margin-top:50px;
+    text-align:center;
+    padding-top:20px;
+    border-top:1px solid rgba(255,255,255,0.15);
+    opacity:.7;
+    font-size:14px;
+}
+
+        /* BACKGROUND */
+.bg{ z-index:-3; }
+.overlay{ z-index:-2; }
+
+/* WATER - behind all PNG */
+.water{
+    z-index:1;
+}
+
+/* SIDE ITEMS */
+.lemon{
+    z-index:3;
+}
+.mint{
+    z-index:3;
+}
+
+/* MAIN CAN - above lemon */
+.can{
+    z-index:4;
+}
+
+/* TEXT - ABOVE CAN */
+.hero-text{
+    z-index:1;
+}
+
+.support-text{
+top:545px;
+    z-index:1;
+    color:#fff;
+}
+
+/* ARROWS */
+.arrow{
+    z-index:7;
+}
+
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">DRINKZZ</div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Flavours</a>
+        <a href="#">About</a>
+    </div>
+</div>
+
+<section class="hero">
+
+    <div class="bg" id="bg"></div>
+    <div class="overlay"></div>
+
+    <div class="hero-text">DRINK UP MOCK</div>
+    <div class="flavor" id="flavor">LEMON MINT</div>
+
+    <!-- PNG LAYERS -->
+    <img src="" class="water">
+    <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png" class="can" id="can">
+    <img src="https://i.ibb.co/j9DmLzpd/Chat-GPT-Image-Feb-24-2026-04-06-57-PM.png" class="lemon">
+    <img src="https://i.ibb.co/j9DmLzpd/Chat-GPT-Image-Feb-24-2026-04-06-57-PM.png" class="mint">
+
+    <div class="arrow left" onclick="prevSlide()">&#10094;</div>
+    <div class="arrow right" onclick="nextSlide()">&#10095;</div>
+
+    <!-- Explore Button -->
+    
+
+    <a href="#flavourShowcase" class="explore-btn">Explore</a>
+
+</section>
+
+<!-- ================= FLAVOUR SHOWCASE ================= -->
+
+<section id="flavourShowcase" class="flavour-showcase">
+
+    <div class=""></div>
+
+    <h1 class="flavour-title">FLAVOURS</h1>
+
+    <div class="can-slider">
+
+        <!-- 10 CANS -->
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>LEMON MINT</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>BERRY BLAST</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>TROPICAL FIZZ</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>MANGO SPARK</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>APPLE COOL</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>ORANGE ZING</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>PEACH FIZZ</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>KIWI SPLASH</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>GRAPE WAVE</p>
+        </div>
+
+        <div class="can-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>WATERMELON ICE</p>
+        </div>
+
+        <!-- DUPLICATE SAME 10 AGAIN FOR PERFECT LOOP -->
+        <!-- copy paste same 10 again below for smooth infinite scroll -->
+
+    </div>
+
+</section>
+
+<!-- ================= WHEAT SHOTS ================= -->
+
+<section id="wheatShots" class="wheat-section">
+
+    <h1 class="wheat-title">WHEAT SHOTS</h1>
+
+    <div class="wheat-slider">
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>CLASSIC WHEAT</p>
+        </a>
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>HONEY WHEAT</p>
+        </a>
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>PROTEIN SHOT</p>
+        </a>
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>ENERGY BOOST</p>
+        </a>
+
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>CLASSIC WHEAT</p>
+        </a>
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>HONEY WHEAT</p>
+        </a>
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>PROTEIN SHOT</p>
+        </a>
+
+        <a href="https://example.com" target="_blank" class="wheat-box">
+            <img src="https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png">
+            <p>ENERGY BOOST</p>
+        </a>
+
+    </div>
+
+</section>
+
+<!-- ================= LOVE TO READ ================= -->
+
+<section id="loveRead" class="read-section">
+
+    <h1 class="read-title">LOVE TO READ</h1>
+
+    <div class="read-container">
+
+        <div class="read-card">
+            <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=800" alt="">
+            <h3>Healthy Living</h3>
+            <p>Discover the power of natural grains and energy boosting drinks that fuel your everyday life.</p>
+            <a href="https://example.com" target="_blank" class="read-btn">Read More</a>
+        </div>
+
+        <div class="read-card">
+            <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=800" alt="">
+            <h3>Nutrition Guide</h3>
+            <p>Understand the benefits of wheat shots and wholesome blends crafted for strength and vitality.</p>
+            <a href="https://example.com" target="_blank" class="read-btn">Read More</a>
+        </div>
+
+        <div class="read-card">
+            <img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=800" alt="">
+            <h3>Wellness Stories</h3>
+            <p>Real experiences from people who transformed their daily routine with natural energy drinks.</p>
+            <a href="https://example.com" target="_blank" class="read-btn">Read More</a>
+        </div>
+
+    </div>
+
+</section>
+
+<footer class="footer">
+
+    <div class="footer-container">
+
+        <!-- LEFT -->
+        <div class="footer-col">
+            <h2>DRINK IT UP</h2>
+            <p>Traditional Drinks. Honest Ingredients.</p>
+        </div>
+
+        <!-- MIDDLE -->
+        <div class="footer-col">
+            <h3>Contact</h3>
+            <p>📍 Address</p>
+            <p>📞 Phone Number</p>
+            <p>📧 Email</p>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="footer-col">
+            <h3>Quick Links</h3>
+            <a href="#">Home</a>
+            <a href="#flavourShowcase">Our Drinks</a>
+            <a href="#loveToRead">Articles</a>
+            <a href="#">Contact</a>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        © DRINK IT UP - ALL RIGHTS RESERVED.
+    </div>
+
+</footer>
+
+<script>
+    const cans = [
+        { image:"https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png", bg:"https://images.unsplash.com/photo-1607224431233-1baa09f6f56d?q=80&w=909&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", flavor:"LEMON MINT" },
+        { image:"https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png", bg:"https://images.unsplash.com/photo-1525431836161-e40d6846e656?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", flavor:"BERRY BLAST" },
+        { image:"https://i.ibb.co/pr1gDQSW/Chat-GPT-Image-Feb-24-2026-11-24-28-AM.png", bg:"https://images.unsplash.com/photo-1517093911940-08cb5b3952e7?q=80&w=744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", flavor:"TROPICAL FIZZ" }
+    ];
+
+    let index = 0;
+
+    const can = document.getElementById("can");
+    const bg = document.getElementById("bg");
+    const flavor = document.getElementById("flavor");
+
+    bg.style.backgroundImage = `url(${cans[index].bg})`;
+
+    function updateSlide(){
+        can.classList.add("cinematic");
+        flavor.style.opacity = 0;
+
+        setTimeout(()=>{
+            can.src = cans[index].image;
+            bg.style.backgroundImage = `url(${cans[index].bg})`;
+            flavor.textContent = cans[index].flavor;
+        },500);
+
+        setTimeout(()=>{
+            can.classList.remove("cinematic");
+            flavor.style.opacity = .8;
+        },1000);
+    }
+
+    function nextSlide(){
+        index = (index + 1) % cans.length;
+        updateSlide();
+    }
+
+    function prevSlide(){
+        index = (index - 1 + cans.length) % cans.length;
+        updateSlide();
+    }
+</script>
+
+</body>
+</html>
